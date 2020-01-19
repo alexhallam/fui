@@ -4,7 +4,7 @@ extern crate fui;
 extern crate regex;
 extern crate serde_json;
 
-use cursive::traits::Boxable;
+use cursive::traits::Resizable;
 use cursive::views::Dialog;
 use cursive::Cursive;
 use regex::Regex;

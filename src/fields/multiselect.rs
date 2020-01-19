@@ -2,7 +2,7 @@ use std::ops::Deref;
 use std::rc::Rc;
 
 use clap;
-use cursive::views::ViewBox;
+use cursive::views::BoxedView;
 use serde_json::value::Value;
 
 use feeders::{DummyFeeder, Feeder};
@@ -28,8 +28,8 @@ impl Multiselect {
 
 #[derive(Clone)]
 pub struct MultiselectManager {
-    feeder: Rc<Feeder>,
-    view_factory: Option<Rc<Fn() -> views::Multiselect>>,
+    feeder: Rc<dyn Feeder>,
+    view_factory: Option<Rc<dyn Fn() -> views::Multiselect>>,
 }
 
 impl MultiselectManager {
@@ -55,7 +55,7 @@ impl MultiselectManager {
     /// [Feeder]: ../../feeders/index.html
     /// [views::Multiselect]: ../../views/struct.Multiselect.html
     /// [with_feeder]: struct.MultiselectManager.html#method.with_feeder
-    pub fn with_factory_view(factory: Rc<Fn() -> views::Multiselect>) -> Self {
+    pub fn with_factory_view(factory: Rc<dyn Fn() -> views::Multiselect>) -> Self {
         MultiselectManager {
             // it should be an option of Rc :)
             feeder: Rc::new(DummyFeeder),
@@ -74,7 +74,7 @@ impl MultiselectManager {
 }
 
 impl WidgetManager for MultiselectManager {
-    fn build_value_view(&self, initial: &str) -> ViewBox {
+    fn build_value_view(&self, initial: &str) -> BoxedView {
         let mut widget = self.get_view();
         if initial.trim() != "" {
             let items = initial
@@ -83,13 +83,13 @@ impl WidgetManager for MultiselectManager {
                 .collect::<Vec<String>>();
             widget.select_items(items);
         }
-        ViewBox::new(Box::new(widget))
+        BoxedView::new(Box::new(widget))
     }
-    fn build_widget(&self, label: &str, help: &str, initial: &str) -> ViewBox {
+    fn build_widget(&self, label: &str, help: &str, initial: &str) -> BoxedView {
         let view = self.build_value_view(initial);
         label_with_help_layout(view, label, help)
     }
-    fn get_value(&self, view_box: &ViewBox) -> String {
+    fn get_value(&self, view_box: &BoxedView) -> String {
         let view_box = fields::value_view_from_layout(view_box);
         let ms: &views::Multiselect = (**view_box).as_any().downcast_ref().unwrap();
 
@@ -103,7 +103,7 @@ impl WidgetManager for MultiselectManager {
 }
 
 impl FormField for Field<MultiselectManager, Vec<String>> {
-    fn get_widget_manager(&self) -> &WidgetManager {
+    fn get_widget_manager(&self) -> &dyn WidgetManager {
         &self.widget_manager
     }
     fn validate(&self, data: &str) -> Result<Value, FieldErrors> {

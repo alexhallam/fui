@@ -3,7 +3,7 @@ extern crate cursive;
 extern crate fui;
 extern crate serde_json;
 
-use cursive::traits::Boxable;
+use cursive::traits::Resizable;
 use cursive::views::Dialog;
 use cursive::Cursive;
 use serde_json::value::Value;

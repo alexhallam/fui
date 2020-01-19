@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
 use cursive::event::{Callback, Event, EventResult, Key};
-use cursive::traits::{Boxable, View};
+use cursive::traits::{Resizable, View};
 use cursive::view::ViewWrapper;
-use cursive::views::{BoxView, DummyView, LinearLayout, OnEventView, Panel, SelectView};
+use cursive::views::{DummyView, LinearLayout, OnEventView, Panel, ResizedView, SelectView};
 use cursive::Cursive;
 use cursive::With;
 
@@ -11,8 +11,8 @@ use super::is_value_from_select;
 use feeders::Feeder;
 use views::Autocomplete;
 
-type OnSelect = Option<Rc<Fn(&mut Cursive, Rc<String>)>>;
-type OnDeselect = Option<Rc<Fn(&mut Cursive, Rc<String>)>>;
+type OnSelect = Option<Rc<dyn Fn(&mut Cursive, Rc<String>)>>;
+type OnDeselect = Option<Rc<dyn Fn(&mut Cursive, Rc<String>)>>;
 
 /// Multiple selection view with suggestions.
 pub struct Multiselect {
@@ -70,7 +70,7 @@ impl Multiselect {
             .get_child(self.options_idx as usize)
             .unwrap()
             .as_any()
-            .downcast_ref::<Panel<BoxView<Autocomplete>>>()
+            .downcast_ref::<Panel<ResizedView<Autocomplete>>>()
             .unwrap();
         box_view.get_inner().get_inner()
     }
@@ -81,7 +81,7 @@ impl Multiselect {
             .get_child(self.selected_idx as usize)
             .unwrap()
             .as_any()
-            .downcast_ref::<Panel<OnEventView<BoxView<SelectView<String>>>>>()
+            .downcast_ref::<Panel<OnEventView<ResizedView<SelectView<String>>>>>()
             .unwrap();
         box_view.get_inner().get_inner().get_inner()
     }
@@ -92,7 +92,7 @@ impl Multiselect {
             .get_child_mut(self.selected_idx as usize)
             .unwrap()
             .as_any_mut()
-            .downcast_mut::<Panel<OnEventView<BoxView<SelectView<String>>>>>()
+            .downcast_mut::<Panel<OnEventView<ResizedView<SelectView<String>>>>>()
             .unwrap();
         box_view.get_inner_mut().get_inner_mut().get_inner_mut()
     }

@@ -294,7 +294,7 @@ impl<T: Display + 'static> Feeder for Vec<T> {
     }
 }
 
-impl Feeder for Rc<Feeder> {
+impl Feeder for Rc<dyn Feeder> {
     fn query(&self, text: &str, position: usize, items_count: usize) -> Vec<String> {
         (**self).query(text, position, items_count)
     }

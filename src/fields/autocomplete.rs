@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use clap;
-use cursive::views::ViewBox;
+use cursive::views::BoxedView;
 use serde_json::value::Value;
 
 use feeders::{DummyFeeder, Feeder};
@@ -18,14 +18,18 @@ impl Autocomplete {
         label: IS,
         feeder: F,
     ) -> fields::Field<AutocompleteManager, String> {
-        fields::Field::new(label, AutocompleteManager::with_feeder(feeder), "".to_string())
+        fields::Field::new(
+            label,
+            AutocompleteManager::with_feeder(feeder),
+            "".to_string(),
+        )
     }
 }
 
 #[derive(Clone)]
 pub struct AutocompleteManager {
-    feeder: Rc<Feeder>,
-    view_factory: Option<Rc<Fn() -> views::Autocomplete>>,
+    feeder: Rc<dyn Feeder>,
+    view_factory: Option<Rc<dyn Fn() -> views::Autocomplete>>,
 }
 
 impl AutocompleteManager {
@@ -51,7 +55,7 @@ impl AutocompleteManager {
     /// [Feeder]: ../../feeders/index.html
     /// [views::Autocomplete]: ../../views/struct.Autocomplete.html
     /// [with_feeder]: struct.AutocompleteManager.html#method.with_feeder
-    pub fn with_factory_view(factory: Rc<Fn() -> views::Autocomplete>) -> Self {
+    pub fn with_factory_view(factory: Rc<dyn Fn() -> views::Autocomplete>) -> Self {
         AutocompleteManager {
             feeder: Rc::new(DummyFeeder),
             view_factory: Some(factory),
@@ -69,25 +73,25 @@ impl AutocompleteManager {
 }
 
 impl WidgetManager for AutocompleteManager {
-    fn build_widget(&self, label: &str, help: &str, initial: &str) -> ViewBox {
+    fn build_widget(&self, label: &str, help: &str, initial: &str) -> BoxedView {
         let viewbox = self.build_value_view(&initial);
         fields::label_with_help_layout(viewbox, &label, &help)
     }
-    fn get_value(&self, view_box: &ViewBox) -> String {
+    fn get_value(&self, view_box: &BoxedView) -> String {
         let view_box = fields::value_view_from_layout(view_box);
         let autocomplete: &views::Autocomplete = (**view_box).as_any().downcast_ref().unwrap();
         let value = (&*(*autocomplete).get_value()).clone();
         value
     }
-    fn build_value_view(&self, value: &str) -> ViewBox {
+    fn build_value_view(&self, value: &str) -> BoxedView {
         let widget = self.get_view();
-        let view = ViewBox::new(Box::new(widget.value(value)));
+        let view = BoxedView::new(Box::new(widget.value(value)));
         view
     }
 }
 
 impl fields::FormField for fields::Field<AutocompleteManager, String> {
-    fn get_widget_manager(&self) -> &WidgetManager {
+    fn get_widget_manager(&self) -> &dyn WidgetManager {
         &self.widget_manager
     }
     fn validate(&self, data: &str) -> Result<Value, FieldErrors> {

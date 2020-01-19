@@ -24,9 +24,9 @@ pub use self::text::Text;
 /// [View]: ../views/index.html
 pub trait WidgetManager {
     /// Builds a value view.
-    fn build_value_view(&self, value: &str) -> views::ViewBox;
+    fn build_value_view(&self, value: &str) -> views::BoxedView;
     /// Gets view's value.
-    fn get_value(&self, view: &views::ViewBox) -> String;
+    fn get_value(&self, view: &views::BoxedView) -> String;
     /// Sets `error` on widget.
     ///
     /// # Note:
@@ -39,9 +39,9 @@ pub trait WidgetManager {
         note = "Errors should be transferred to `Field`. Use `Field.set_error`"
     )]
     // TODO:: rm it
-    fn set_error(&self, viewbox: &mut views::ViewBox, error: &str) {
+    fn set_error(&self, viewbox: &mut views::BoxedView, error: &str) {
         let layout: &mut views::LinearLayout = (**viewbox).as_any_mut().downcast_mut().unwrap();
-        let child: &mut View = (*layout).get_child_mut(2).unwrap();
+        let child: &mut dyn View = (*layout).get_child_mut(2).unwrap();
         let text: &mut views::TextView = (*child).as_any_mut().downcast_mut().unwrap();
         text.set_content(error);
     }
@@ -57,7 +57,7 @@ pub trait WidgetManager {
         note = "Values like `help` or `label` should be stored on `FormField`. Details in documentation of `WidgetManager.build_widget`"
     )]
     // TODO:: rm it
-    fn build_widget(&self, label: &str, help: &str, initial: &str) -> views::ViewBox;
+    fn build_widget(&self, label: &str, help: &str, initial: &str) -> views::BoxedView;
 }
 
 /// Building block for `Form`s which stores `data` and `Widget`.
@@ -66,7 +66,7 @@ pub struct Field<W: WidgetManager, T> {
     label: String,
     help: String,
     initial: T,
-    validators: Vec<Rc<Validator>>,
+    validators: Vec<Rc<dyn Validator>>,
     widget_manager: W,
 }
 
@@ -109,7 +109,7 @@ pub type FieldErrors = Vec<String>;
 /// Covers communication from `Form` to `Field`.
 pub trait FormField {
     /// Builds `widget` representing this `field`.
-    fn build_widget(&self) -> views::ViewBox {
+    fn build_widget(&self) -> views::BoxedView {
         let view = self
             .get_widget_manager()
             .build_value_view(&self.get_initial());
@@ -124,7 +124,7 @@ pub trait FormField {
     /// Gets `initial` value
     fn get_initial(&self) -> String;
     /// Gets manager which controlls `widget`.
-    fn get_widget_manager(&self) -> &WidgetManager;
+    fn get_widget_manager(&self) -> &dyn WidgetManager;
     /// Builds [clap::Arg] needed by automatically generated [clap::App].
     ///
     /// [clap::Arg]: ../../clap/struct.Arg.html
@@ -137,9 +137,9 @@ pub trait FormField {
     /// Checks if Field is required
     fn is_required(&self) -> bool;
     /// Sets `error` on widget.
-    fn set_error(&self, viewbox: &mut views::ViewBox, error: &str) {
+    fn set_error(&self, viewbox: &mut views::BoxedView, error: &str) {
         let layout: &mut views::LinearLayout = (**viewbox).as_any_mut().downcast_mut().unwrap();
-        let child: &mut View = (*layout).get_child_mut(2).unwrap();
+        let child: &mut dyn View = (*layout).get_child_mut(2).unwrap();
         let text: &mut views::TextView = (*child).as_any_mut().downcast_mut().unwrap();
         text.set_content(error);
     }
@@ -154,7 +154,11 @@ fn format_annotation(label: &str, help: &str) -> String {
 }
 
 /// Widget layout where `label` and `help` are in the same line.
-pub fn label_with_help_layout(view_box: views::ViewBox, label: &str, help: &str) -> views::ViewBox {
+pub fn label_with_help_layout(
+    view_box: views::BoxedView,
+    label: &str,
+    help: &str,
+) -> views::BoxedView {
     let text = format_annotation(label, help);
     let widget = views::LinearLayout::vertical()
         .child(views::TextView::new(text))
@@ -162,12 +166,12 @@ pub fn label_with_help_layout(view_box: views::ViewBox, label: &str, help: &str)
         .child(views::TextView::new(""))
         .child(views::DummyView);
 
-    views::ViewBox::new(Box::new(widget))
+    views::BoxedView::new(Box::new(widget))
 }
 
 /// Finds view storing value in widget layout
-pub fn value_view_from_layout(layout: &views::ViewBox) -> &views::ViewBox {
+pub fn value_view_from_layout(layout: &views::BoxedView) -> &views::BoxedView {
     let layout: &views::LinearLayout = (**layout).as_any().downcast_ref().unwrap();
-    let value_view: &View = layout.get_child(1).unwrap();
+    let value_view: &dyn View = layout.get_child(1).unwrap();
     (*value_view).as_any().downcast_ref().unwrap()
 }

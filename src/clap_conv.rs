@@ -125,7 +125,7 @@ macro_rules! warn_incompat {
     )
 }
 
-fn clap_app2fields(clap_app: &clap::App) -> Vec<Box<FormField>> {
+fn clap_app2fields(clap_app: &clap::App) -> Vec<Box<dyn FormField>> {
     let mut field_list = Vec::new();
     // TODO: flag & option & positional loops are mostly copy & paste so make it DRY
     // using AnyArg can help, see
@@ -147,14 +147,14 @@ fn clap_app2fields(clap_app: &clap::App) -> Vec<Box<FormField>> {
                 field = field.validator(Required);
             }
             field = copy_default_multi(field, pos.v.default_val, pos.v.val_delim);
-            field_list.push(Box::new(field) as Box<FormField>);
+            field_list.push(Box::new(field) as Box<dyn FormField>);
         } else {
             let mut field = field_with_vals(&pos.v.possible_vals, long, help);
             field = copy_default(field, pos.v.default_val);
             if pos.b.settings.is_set(ArgSettings::Required) {
                 field = field.validator(Required);
             }
-            field_list.push(Box::new(field) as Box<FormField>);
+            field_list.push(Box::new(field) as Box<dyn FormField>);
         }
     }
     for option in clap_app.p.opts.iter() {
@@ -175,14 +175,14 @@ fn clap_app2fields(clap_app: &clap::App) -> Vec<Box<FormField>> {
                 field = field.validator(Required);
             }
             field = copy_default_multi(field, option.v.default_val, option.v.val_delim);
-            field_list.push(Box::new(field) as Box<FormField>);
+            field_list.push(Box::new(field) as Box<dyn FormField>);
         } else {
             let mut field = field_with_vals(&option.v.possible_vals, long, help);
             if option.b.settings.is_set(ArgSettings::Required) {
                 field = field.validator(Required);
             }
             field = copy_default(field, option.v.default_val);
-            field_list.push(Box::new(field) as Box<FormField>);
+            field_list.push(Box::new(field) as Box<dyn FormField>);
         }
     }
     for flag in clap_app.p.flags.iter() {
@@ -200,10 +200,10 @@ fn clap_app2fields(clap_app: &clap::App) -> Vec<Box<FormField>> {
         if flag.b.settings.is_set(ArgSettings::Multiple) {
             // TODO: add validator for a positive integer
             let field = Text::new(long).help(help);
-            field_list.push(Box::new(field) as Box<FormField>);
+            field_list.push(Box::new(field) as Box<dyn FormField>);
         } else {
             let field = Checkbox::new(long).help(help);
-            field_list.push(Box::new(field) as Box<FormField>);
+            field_list.push(Box::new(field) as Box<dyn FormField>);
         }
     }
     field_list
