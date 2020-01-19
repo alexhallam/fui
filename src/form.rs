@@ -5,7 +5,7 @@ use std::rc::Rc;
 use clap;
 use cursive::event::{Callback, Event, EventResult, Key, MouseButton, MouseEvent};
 use cursive::view::{View, ViewWrapper};
-use cursive::views::{Dialog, DialogFocus, LinearLayout, ViewBox};
+use cursive::views::{BoxedView, Dialog, DialogFocus, LinearLayout};
 use cursive::Cursive;
 use serde_json::map::Map;
 use serde_json::value::Value;
@@ -15,8 +15,8 @@ use fields::{FieldErrors, FormField};
 /// Container for form's errors.
 pub type FormErrors = HashMap<String, FieldErrors>;
 
-type OnSubmit = Option<Rc<Fn(&mut Cursive, Value)>>;
-type OnCancel = Option<Rc<Fn(&mut Cursive)>>;
+type OnSubmit = Option<Rc<dyn Fn(&mut Cursive, Value)>>;
+type OnCancel = Option<Rc<dyn Fn(&mut Cursive)>>;
 
 /// Aggregates [Fields] and handles process of `submitting` (or `canceling`).
 ///
@@ -24,7 +24,7 @@ type OnCancel = Option<Rc<Fn(&mut Cursive)>>;
 pub struct FormView {
     view: Dialog,
 
-    fields: Vec<Box<FormField>>,
+    fields: Vec<Box<dyn FormField>>,
     on_submit: OnSubmit,
     on_cancel: OnCancel,
 }
@@ -50,7 +50,7 @@ impl FormView {
     }
 
     /// Appends boxed `field` to field list.
-    pub fn boxed_field(mut self, field: Box<FormField>) -> Self {
+    pub fn boxed_field(mut self, field: Box<dyn FormField>) -> Self {
         let widget = field.build_widget();
         self.view
             .get_content_mut()
@@ -147,7 +147,7 @@ impl FormView {
                 .unwrap()
                 .get_child(idx)
                 .unwrap();
-            let view_box: &ViewBox = (*view).as_any().downcast_ref().unwrap();
+            let view_box: &BoxedView = (*view).as_any().downcast_ref().unwrap();
             let value = field.get_widget_manager().get_value(view_box);
             let label = field.get_label();
             match field.validate(value.as_ref()) {
@@ -182,7 +182,7 @@ impl FormView {
             //  or
             //  form should only call field.validate and rest would be handled by field
             //  which should solve this issue?
-            let mut view = self
+            let view = self
                 .view
                 .get_content_mut()
                 .as_any_mut()
@@ -190,7 +190,7 @@ impl FormView {
                 .unwrap()
                 .get_child_mut(idx)
                 .unwrap();
-            let viewbox: &mut ViewBox = view.as_any_mut().downcast_mut().unwrap();
+            let viewbox: &mut BoxedView = view.as_any_mut().downcast_mut().unwrap();
             field.set_error(viewbox, error.unwrap_or(&"".to_string()));
         }
     }
@@ -226,7 +226,7 @@ impl FormView {
     }
 
     /// Gets fields of `FormView`
-    pub fn get_fields(&self) -> &[Box<FormField>] {
+    pub fn get_fields(&self) -> &[Box<dyn FormField>] {
         &self.fields
     }
 
@@ -245,7 +245,7 @@ impl FormView {
                     .unwrap()
                     .get_child(idx)
                     .unwrap();
-                let view_box: &ViewBox = (*view).as_any().downcast_ref().unwrap();
+                let view_box: &BoxedView = (*view).as_any().downcast_ref().unwrap();
                 value = Some(form_field.get_widget_manager().get_value(view_box));
                 break;
             }

@@ -21,26 +21,26 @@ impl Checkbox {
 pub struct CheckboxManager;
 
 impl fields::WidgetManager for CheckboxManager {
-    fn build_widget(&self, label: &str, help: &str, initial: &str) -> views::ViewBox {
+    fn build_widget(&self, label: &str, help: &str, initial: &str) -> views::BoxedView {
         let checkbox = self.build_value_view(&initial);
         fields::label_with_help_layout(checkbox, &label, &help)
     }
-    fn get_value(&self, view_box: &views::ViewBox) -> String {
+    fn get_value(&self, view_box: &views::BoxedView) -> String {
         let view_box = fields::value_view_from_layout(view_box);
         let checkbox: &views::Checkbox = (**view_box).as_any().downcast_ref().unwrap();
         let value = checkbox.is_checked();
         format!("{}", value)
     }
-    fn build_value_view(&self, value: &str) -> views::ViewBox {
+    fn build_value_view(&self, value: &str) -> views::BoxedView {
         let value = FromStr::from_str(value).unwrap();
         let mut checkbox = views::Checkbox::new();
         checkbox.set_checked(value);
-        views::ViewBox::new(Box::new(checkbox))
+        views::BoxedView::new(Box::new(checkbox))
     }
 }
 
 impl fields::FormField for fields::Field<CheckboxManager, bool> {
-    fn get_widget_manager(&self) -> &WidgetManager {
+    fn get_widget_manager(&self) -> &dyn WidgetManager {
         &self.widget_manager
     }
 

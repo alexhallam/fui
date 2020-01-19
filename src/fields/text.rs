@@ -19,23 +19,23 @@ impl Text {
 pub struct TextManager;
 
 impl WidgetManager for TextManager {
-    fn build_widget(&self, label: &str, help: &str, initial: &str) -> views::ViewBox {
+    fn build_widget(&self, label: &str, help: &str, initial: &str) -> views::BoxedView {
         let view = self.build_value_view(initial);
         fields::label_with_help_layout(view, label, help)
     }
-    fn get_value(&self, view_box: &views::ViewBox) -> String {
+    fn get_value(&self, view_box: &views::BoxedView) -> String {
         let view_box = fields::value_view_from_layout(view_box);
         let edit: &views::EditView = (**view_box).as_any().downcast_ref().unwrap();
         let value: String = (&*edit.get_content()).clone();
         value
     }
-    fn build_value_view(&self, value: &str) -> views::ViewBox {
-        views::ViewBox::new(Box::new(views::EditView::new().content(value)))
+    fn build_value_view(&self, value: &str) -> views::BoxedView {
+        views::BoxedView::new(Box::new(views::EditView::new().content(value)))
     }
 }
 
 impl fields::FormField for fields::Field<TextManager, String> {
-    fn get_widget_manager(&self) -> &WidgetManager {
+    fn get_widget_manager(&self) -> &dyn WidgetManager {
         &self.widget_manager
     }
     fn validate(&self, data: &str) -> Result<Value, FieldErrors> {

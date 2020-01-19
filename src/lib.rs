@@ -34,7 +34,7 @@ pub mod views;
 use clipboard::ClipboardContext;
 use clipboard::ClipboardProvider;
 use cursive::event::Event;
-use cursive::traits::{Boxable, Identifiable};
+use cursive::traits::{Nameable, Resizable};
 use cursive::view::Scrollable;
 use cursive::views::{Dialog, LayerPosition, OnEventView};
 use cursive::Cursive;
@@ -58,7 +58,7 @@ struct Action<'action> {
     name: &'action str,
     help: &'action str,
     form: Option<FormView>,
-    handler: Rc<Fn(Value)>,
+    handler: Rc<dyn Fn(Value)>,
 }
 
 impl<'action> Action<'action> {
@@ -83,7 +83,7 @@ fn value2array(value: &Value) -> Vec<String> {
                     result.push(format!("{}", n));
                 }
                 Value::String(s) => {
-                    if  val != "" {
+                    if val != "" {
                         if !key_is_digit {
                             result.push(format!("--{}", key));
                         }
@@ -350,15 +350,15 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
         });
     }
 
-    fn add_form(&self, c: &mut Cursive, form: FormView, form_id: &str) {
-        // `with_id` must be before `OnEventView`
-        let form = form.with_id(form_id).full_width().scrollable();
+    fn add_form(&self, c: &mut Cursive, form: FormView, form_name: &str) {
+        // `with_name` must be before `OnEventView`
+        let form = form.with_name(form_name).full_width().scrollable();
         let prog_name = self.name.to_owned();
-        let form_id = form_id.to_owned();
+        let form_name = form_name.to_owned();
         let form = OnEventView::new(form).on_event(Event::CtrlChar('k'), move |c| {
-            let err = c.call_on_id(&form_id, |form: &mut FormView| match form.validate() {
+            let err = c.call_on_name(&form_name, |form: &mut FormView| match form.validate() {
                 Ok(s) => {
-                    let msg = format!("{} {} {}", prog_name, form_id, s.dump_as_cli());
+                    let msg = format!("{} {} {}", prog_name, form_name, s.dump_as_cli());
                     let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                     ctx.set_contents(msg).unwrap();
                     Ok(())
@@ -382,9 +382,9 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
             .iter_mut()
             .map(|(_, a)| (a.name, a.form.take().unwrap()))
             .collect::<Vec<(&str, FormView)>>();
-        for (form_id, mut form) in action_form_list.into_iter() {
+        for (form_name, mut form) in action_form_list.into_iter() {
             self.set_form_events(&mut form);
-            self.add_form(c, form, form_id);
+            self.add_form(c, form, form_name);
         }
     }
 
@@ -422,14 +422,14 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
                 *step_cancel.borrow_mut() -= 1;
                 c.quit();
             })
-            .with_id(COMMAND_PICKER_ID)
+            .with_name(COMMAND_PICKER_ID)
             .full_screen();
         c.add_layer(form)
     }
 
     fn top_layer_by_name(&self, cursive: &mut Cursive, layer_name: &str) {
         let stack = cursive.screen_mut();
-        let from = stack.find_layer_from_id(layer_name).unwrap();
+        let from = stack.find_layer_from_name(layer_name).unwrap();
         stack.move_layer(from, LayerPosition::FromFront(0));
     }
 
@@ -452,7 +452,7 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
         self.add_forms(&mut c);
         self.add_cmd_picker(&mut c);
         loop {
-            let current_step =  *self.active_step.borrow();
+            let current_step = *self.active_step.borrow();
             match current_step {
                 0 => ::std::process::exit(0),
                 1 => {
@@ -465,7 +465,7 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
                         continue;
                     }
                     self.top_layer_by_name(&mut c, COMMAND_PICKER_ID);
-                },
+                }
                 2 => {
                     // show form
                     let action_with_desc = match self.picked_action.borrow().clone() {
@@ -473,7 +473,7 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
                         None => {
                             *self.active_step.borrow_mut() = 1;
                             continue;
-                        },
+                        }
                     };
                     // to get action name we have to extract it from "name: desc"
                     let action_name = self.actions.get(&action_with_desc).unwrap().name;
@@ -484,7 +484,7 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
                         continue;
                     }
                     self.top_layer_by_name(&mut c, action_name);
-                },
+                }
                 3 => break,
                 _ => unimplemented!(),
             }

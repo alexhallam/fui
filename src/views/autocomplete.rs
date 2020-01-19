@@ -1,11 +1,11 @@
 use std::rc::Rc;
 
 use cursive::event::{Callback, Event, EventResult, Key};
-use cursive::traits::Boxable;
+use cursive::traits::Resizable;
 use cursive::traits::View;
 use cursive::view::SizeConstraint;
 use cursive::view::ViewWrapper;
-use cursive::views::BoxView;
+use cursive::views::ResizedView;
 use cursive::views::{EditView, LinearLayout, SelectView};
 use cursive::Cursive;
 use cursive::With;
@@ -15,13 +15,13 @@ use feeders::Feeder;
 
 // TODO: better performance while typing
 
-pub type OnSubmit = Option<Rc<Fn(&mut Cursive, Rc<String>)>>;
+pub type OnSubmit = Option<Rc<dyn Fn(&mut Cursive, Rc<String>)>>;
 
 /// Single selection view with suggestions.
 pub struct Autocomplete {
-    view: BoxView<LinearLayout>,
+    view: ResizedView<LinearLayout>,
 
-    feeder: Rc<Feeder>,
+    feeder: Rc<dyn Feeder>,
     shown_count: u8,
     submit_anything: bool,
     suggestion_offset: usize,
@@ -265,7 +265,7 @@ impl Autocomplete {
 }
 
 impl ViewWrapper for Autocomplete {
-    wrap_impl!(self.view: BoxView<LinearLayout>);
+    wrap_impl!(self.view: ResizedView<LinearLayout>);
 
     fn wrap_on_event(&mut self, event: Event) -> EventResult {
         match event {

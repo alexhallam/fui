@@ -10,7 +10,7 @@ pub trait Validator: Debug {
     /// Validates data returning None (when Ok) or String with error.
     fn validate(&self, data: &str) -> Option<String>;
     /// Allows downcasting `self` to a `Any`.
-    fn as_any(&self) -> &Any;
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// Ensures data is included.
@@ -36,7 +36,7 @@ impl Validator for Required {
         }
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -70,7 +70,7 @@ impl Validator for PathFree {
         }
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -108,7 +108,7 @@ impl Validator for DirExists {
         }
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -146,7 +146,7 @@ impl Validator for FileExists {
         }
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -178,7 +178,7 @@ where
         }
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
@@ -195,7 +195,7 @@ impl Validator for Regex {
         }
     }
 
-    fn as_any(&self) -> &Any {
+    fn as_any(&self) -> &dyn Any {
         self
     }
 }
