@@ -17,7 +17,7 @@ fn submit_handler(c: &mut Cursive, data: Value) {
 }
 
 fn main() {
-    let mut siv = Cursive::default();
+    let mut siv = cursive::default();
 
     let options = vec!["op1", "op2", "op3"];
 

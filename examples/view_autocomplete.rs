@@ -18,7 +18,7 @@ fn handler(c: &mut Cursive, submitted: Rc<String>) {
 }
 
 fn main() {
-    let mut c = Cursive::default();
+    let mut c = cursive::default();
 
     let widget = LinearLayout::vertical()
         .child(Autocomplete::new(DirItems::new()).on_submit(handler))

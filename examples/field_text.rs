@@ -20,7 +20,7 @@ fn show_data(c: &mut Cursive, data: Value) {
 }
 
 fn main() {
-    let mut siv = Cursive::default();
+    let mut siv = cursive::default();
 
     let form = FormView::new()
         .field(Text::new("basic-field"))
