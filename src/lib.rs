@@ -448,7 +448,7 @@ impl<'attrs, 'action> Fui<'attrs, 'action> {
     fn input_from_tui(&mut self) -> Option<(String, Value)> {
         // Cursive blocks stdout, unless it's dropped, so
         // deattached cursive here to allow destroying it at the end of this fn
-        let mut c = Cursive::default();
+        let mut c = cursive::default();
         self.add_forms(&mut c);
         self.add_cmd_picker(&mut c);
         loop {

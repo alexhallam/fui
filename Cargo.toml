@@ -18,7 +18,7 @@ dirs = "1.0"
 glob = "0.2"
 regex = "0.2"
 serde_json = "1.0"
-cursive = { version = "0.14", default-features = false }
+cursive = { version = "0.16", default-features = false }
 
 [features]
 markdown = ["cursive/markdown"]

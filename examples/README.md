@@ -48,7 +48,7 @@ These examples show more details about `Fields`.
 `Views` handle user interaction. `Views` are building blocks for `Fields`.
 These examples show more details about `Views`.
 
-* [`view_autocomplete`](view_autocomplete.rs) 
+* [`view_autocomplete`](view_autocomplete.rs)
 * [`view_multiselect`](view_multiselect.rs)
 
 More `Views` are already defined in `fui` dependency crate [Cursive](http://docs.rs/cursive)
