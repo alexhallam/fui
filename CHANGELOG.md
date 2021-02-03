@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1
+
+* Fixed compilation error casued by calling `.as_ref()` [123](https://github.com/xliiv/fui/pull/123)
+
+### Detailed change list
+
+https://github.com/xliiv/fui/compare/v1.0.0...v1.0.1
+
 ## 1.0.0
 
 Added partial support for creating `Fui` from `clap::App`.
