@@ -3,7 +3,7 @@
 
 [![docs.rs](https://docs.rs/fui/badge.svg)](https://docs.rs/crate/fui)
 [![crates.io](https://meritbadge.herokuapp.com/fui)](https://crates.io/crates/fui)
-[![Build Status](https://travis-ci.org/xliiv/fui.svg?branch=master)](https://travis-ci.org/xliiv/fui)
+[![CI](https://github.com/xliiv/fui/workflows/CI/badge.svg)](https://github.com/xliiv/fui/actions?query=workflow%3ACI+branch%3Amaster+)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 
