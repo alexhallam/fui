@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.0
+
+The Major number is upgraded, because this version is backward incompatible.
+
+* Upgrade [Cursive](https://crates.io/crates/cursive) to 0.16
+
+### Detailed change list
+
+https://github.com/xliiv/fui/compare/v1.0.1...v2.0.0
+
 ## 1.0.1
 
 * Fixed compilation error casued by calling `.as_ref()` [123](https://github.com/xliiv/fui/pull/123)

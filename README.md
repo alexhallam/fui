@@ -16,7 +16,7 @@ Add CLI & form interface to your program.
 
 ```toml
 [dependencies]
-fui = "1.0"
+fui = "2.0"
 ```
 
 #### Using with [`clap`](https://crates.io/crates/clap) (experimental)
