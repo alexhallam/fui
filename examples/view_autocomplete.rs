@@ -4,7 +4,7 @@ extern crate fui;
 
 use std::rc::Rc;
 
-use cursive::traits::Boxable;
+use cursive::traits::Resizable;
 use cursive::views::{Dialog, DummyView, LinearLayout};
 use cursive::Cursive;
 
