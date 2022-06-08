@@ -1,8 +1,6 @@
 # fui
-
-
-[![docs.rs](https://docs.rs/fui/badge.svg)](https://docs.rs/crate/fui)
-[![crates.io](https://meritbadge.herokuapp.com/fui)](https://crates.io/crates/fui)
+[![Crate](https://img.shields.io/crates/v/fui.svg)](https://crates.io/crates/fui)
+![Crates.io](https://img.shields.io/crates/d/fui?label=creates.io%20downloads)
 [![CI](https://github.com/xliiv/fui/workflows/CI/badge.svg)](https://github.com/xliiv/fui/actions?query=workflow%3ACI+branch%3Amaster+)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
